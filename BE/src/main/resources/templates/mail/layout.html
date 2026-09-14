@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+  Layout condiviso delle email.
+
+  Perche' e' scritto con le <table> e non con i <div>:
+  i client di posta (Outlook su Windows usa il motore di Word) non
+  supportano flexbox, grid, o i CSS esterni. L'unico modo affidabile
+  di impaginare e' annidare tabelle e scrivere il CSS INLINE su ogni
+  elemento. E' brutto, ma e' quello che fanno anche Stripe e Amazon.
+
+  role="presentation" dice agli screen reader che la tabella serve
+  solo a impaginare e non contiene dati.
+-->
+<html xmlns:th="http://www.thymeleaf.org" lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title th:text="${titolo}">Nexa Bank</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f6fb;">
+
+<!-- Testo di anteprima: compare nella lista dei messaggi, poi viene nascosto -->
+<div style="display:none; max-height:0; overflow:hidden; opacity:0;"
+     th:text="${anteprima}">Anteprima</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background-color:#f4f6fb; padding:32px 16px;">
+  <tr>
+    <td align="center">
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="max-width:560px; background-color:#ffffff; border-radius:16px;
+                    border:1px solid #dde3ee; overflow:hidden;">
+
+        <!-- Intestazione -->
+        <tr>
+          <td style="padding:28px 32px 0 32px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="background-color:#2a78d6; border-radius:8px; width:34px; height:34px;
+                           text-align:center; vertical-align:middle;
+                           font-family:Arial,sans-serif; font-size:17px; font-weight:bold; color:#ffffff;">
+                  N
+                </td>
+                <td style="padding-left:10px; font-family:Arial,sans-serif;
+                           font-size:17px; font-weight:bold; color:#0f1729;">
+                  Nexa Bank
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Contenuto specifico della singola email -->
+        <tr>
+          <td style="padding:24px 32px 32px 32px;
+                     font-family:Arial,sans-serif; font-size:15px; line-height:1.6; color:#59647d;">
+            <!-- I doppi underscore sono il "preprocessing" di Thymeleaf: la variabile
+                 viene risolta PRIMA, e il risultato ("mail/x :: contenuto") viene poi
+                 interpretato come espressione di frammento anziche' come nome di file -->
+            <th:block th:replace="~{__${contenuto}__}">Contenuto</th:block>
+          </td>
+        </tr>
+
+        <!-- Piè di pagina -->
+        <tr>
+          <td style="padding:20px 32px; background-color:#eef2fa;
+                     font-family:Arial,sans-serif; font-size:12px; line-height:1.5; color:#8a93a8;">
+            Questa è un'email automatica, non rispondere a questo indirizzo.<br />
+            Nexa Bank · progetto didattico
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
