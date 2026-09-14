@@ -63,7 +63,9 @@ public class TransactionService {
         }
 
         User destinatario = userRepository.findByIban(ibanDestinatario)
-                .orElseThrow(() -> new ResourceNotFoundException("IBAN destinatario non trovato"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Questo IBAN non appartiene a nessun conto Nexa Bank: "
+                                + "in questa applicazione i bonifici sono possibili solo tra conti interni"));
 
         if (!destinatario.isActive()) {
             throw new UserNotActiveException("Il conto del destinatario non è attivo");

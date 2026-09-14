@@ -52,7 +52,10 @@ export default function BeneficiariesPage() {
     <div className="page">
       <div className="panel">
         <h2>Aggiungi un beneficiario</h2>
-        <p className="panel-subtitle">Puoi salvare solo conti Nexa Bank esistenti.</p>
+        <p className="panel-subtitle">
+          Puoi salvare qualsiasi IBAN. I bonifici, però, sono possibili solo verso conti Nexa Bank:
+          gli altri restano in rubrica contrassegnati come <em>esterni</em>.
+        </p>
         <form onSubmit={handleSubmit} className="form">
           <Alert>{error}</Alert>
           <div className="field-row">
@@ -94,12 +97,27 @@ export default function BeneficiariesPage() {
                   {b.nome.charAt(0).toUpperCase()}
                 </span>
                 <div className="ben-main">
-                  <span className="ben-name">{b.nome}</span>
+                  <span className="ben-name">
+                    {b.nome}
+                    {!b.contoInterno && (
+                      <span
+                        className="status-pill status-inactive"
+                        title="Non è un conto Nexa Bank: da qui non puoi inviargli denaro"
+                      >
+                        Esterno
+                      </span>
+                    )}
+                  </span>
                   <span className="ben-iban mono">{formatIban(b.iban)}</span>
                 </div>
                 <div className="ben-actions">
-                  <button type="button" className="btn-ghost btn-sm"
-                    onClick={() => navigate('/bonifico', { state: { iban: b.iban } })}>
+                  <button
+                    type="button"
+                    className="btn-ghost btn-sm"
+                    disabled={!b.contoInterno}
+                    title={b.contoInterno ? undefined : 'Conto non presente in Nexa Bank'}
+                    onClick={() => navigate('/bonifico', { state: { iban: b.iban } })}
+                  >
                     Invia
                   </button>
                   <button type="button" className="btn-icon-danger"

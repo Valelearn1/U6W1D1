@@ -33,15 +33,17 @@ public class BeneficiaryService {
     public BeneficiaryResponseDTO create(BeneficiaryRequestDTO dto, User user) {
         String iban = dto.iban().replaceAll("\\s+", "").toUpperCase();
 
+        // La rubrica e' un semplice elenco di contatti: accetta qualsiasi IBAN
+        // ben formato. Che il conto esista davvero viene verificato al momento
+        // del bonifico, non del salvataggio.
+        if (!iban.matches("IT\\d{26}")) {
+            throw new IllegalArgumentException("IBAN non valido: servono IT seguito da 26 cifre");
+        }
         if (iban.equals(user.getIban())) {
             throw new IllegalArgumentException("Non puoi salvare il tuo stesso conto in rubrica");
         }
         if (beneficiaryRepository.existsByUser_IdAndIban(user.getId(), iban)) {
             throw new IllegalArgumentException("Questo IBAN è già in rubrica");
-        }
-        // Si possono salvare solo conti che esistono davvero
-        if (userRepository.findByIban(iban).isEmpty()) {
-            throw new ResourceNotFoundException("Nessun conto trovato con questo IBAN");
         }
 
         Beneficiary beneficiary = new Beneficiary();
@@ -51,6 +53,7 @@ public class BeneficiaryService {
         return toDTO(beneficiaryRepository.save(beneficiary));
     }
 
+
     @Transactional
     public void delete(UUID id, User user) {
         Beneficiary beneficiary = beneficiaryRepository.findByIdAndUser_Id(id, user.getId())
@@ -59,6 +62,7 @@ public class BeneficiaryService {
     }
 
     private BeneficiaryResponseDTO toDTO(Beneficiary b) {
-        return new BeneficiaryResponseDTO(b.getId(), b.getNome(), b.getIban(), b.getCreatedAt());
+        boolean interno = userRepository.findByIban(b.getIban()).isPresent();
+        return new BeneficiaryResponseDTO(b.getId(), b.getNome(), b.getIban(), interno, b.getCreatedAt());
     }
 }

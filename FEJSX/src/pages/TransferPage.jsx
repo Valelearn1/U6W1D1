@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Alert from '../components/Alert'
 import { api, ApiError } from '../api/client'
 import { useAuth, useAccount, useToast } from '../context/contexts'
@@ -11,8 +11,12 @@ export default function TransferPage() {
   const { beneficiaries } = useAccount()
   const toast = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
 
-  const [iban, setIban] = useState('')
+  // Se si arriva dal pulsante "Invia" della rubrica, l'IBAN è già compilato
+  const [iban, setIban] = useState(() =>
+    location.state?.iban ? formatIbanInput(location.state.iban) : '',
+  )
   const [importo, setImporto] = useState('')
   const [categoria, setCategoria] = useState('ALTRO')
   const [descrizione, setDescrizione] = useState('')
